@@ -8,11 +8,30 @@ set(CMAKE_AUTOMOC ON)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE}/bin)
 
 include_directories(include)
+
+set(CMAKE_PREFIX_PATH "D:/dagong/test/vcpkg/installed/x64-windows" ${CMAKE_PREFIX_PATH})
+
+if(MSVC)
+    add_compile_options(/EHsc)
+endif()
+
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
+find_package(Threads REQUIRED)
+find_package(ZXing REQUIRED)
+find_package(OpenCV REQUIRED)
+
+get_target_property(ZXING_INCLUDES ZXing::ZXing INTERFACE_INCLUDE_DIRECTORIES)
+
+message(STATUS "ZXing include path = ${ZXING_INCLUDES}")
 file(GLOB SOURCES "src/*.cpp")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} 
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${ZXING_INCLUDES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE 
     Qt5::Core
     Qt5::Widgets
+    ZXing::ZXing
+    ${OpenCV_LIBS}
 )
