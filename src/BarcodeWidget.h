@@ -33,7 +33,7 @@ private slots:
      *
      * @param filePath 当前选择的文件路径。
      */
-    void updateButtonStates(const QString& filePath);
+    void updateButtonStates(const QString& filePath) const;
 
     /**
      * @brief 打开文件浏览器并选择一个文件，在文本框显示选择的文件路径。
@@ -46,7 +46,7 @@ private slots:
     void onGenerateClicked();
 
     /**
-     * @brief 解码二维码并保存为化验表文件。
+     * @brief 解码二维码并保存为文件。
      */
     void onDecodeToChemFileClicked();
 

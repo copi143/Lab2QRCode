@@ -37,22 +37,20 @@ BarcodeWidget::BarcodeWidget(QWidget* parent)
     setFixedSize(500, 500);
 
     auto* mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(15);
-    mainLayout->setContentsMargins(20, 20, 20, 20);
+    mainLayout->setSpacing(20);  // 调整控件之间的间距
+    mainLayout->setContentsMargins(30, 20, 30, 20);  // 设置内边距
 
-    QFont font;
-    font.setPointSize(11);
-    setFont(font);
-
-    // 文件路径 + 按钮
     auto* fileLayout = new QHBoxLayout();
     filePathEdit = new QLineEdit(this);
     filePathEdit->setPlaceholderText("选择一个文件或图片");
-    filePathEdit->setFont(QFont("Arial", 15));  // 设置加粗字体
+    filePathEdit->setFont(QFont("Arial", 14));
+    filePathEdit->setStyleSheet("QLineEdit { border: 1px solid #ccc; border-radius: 5px; padding: 5px; background-color: #f9f9f9; }");
 
     QPushButton* browseButton = new QPushButton("浏览", this);
     browseButton->setFixedWidth(100);
-    browseButton->setFont(QFont("Arial", 15));  // 设置加粗字体
+    browseButton->setFont(QFont("Arial", 16));
+    browseButton->setStyleSheet("QPushButton { background-color: #4CAF50; color: white; border-radius: 5px; padding: 10px; }"
+        "QPushButton:disabled { background-color: #ddd; }");
     fileLayout->addWidget(filePathEdit);
     fileLayout->addWidget(browseButton);
     mainLayout->addLayout(fileLayout);
@@ -65,9 +63,10 @@ BarcodeWidget::BarcodeWidget(QWidget* parent)
     generateButton->setFixedHeight(40);
     saveButton->setFixedHeight(40);
     decodeToChemFile->setFixedHeight(40);
-    generateButton->setFont(QFont("Arial", 15));
-    decodeToChemFile->setFont(QFont("Arial", 15));
-    saveButton->setFont(QFont("Arial", 15));
+    generateButton->setFont(QFont("Consolas", 16));
+    decodeToChemFile->setFont(QFont("Consolas", 16));
+    saveButton->setFont(QFont("Consolas", 16));
+
 
     generateButton->setEnabled(false);
     decodeToChemFile->setEnabled(false);
@@ -78,25 +77,24 @@ BarcodeWidget::BarcodeWidget(QWidget* parent)
     buttonLayout->addWidget(saveButton);
     mainLayout->addLayout(buttonLayout);
 
+    // 图片展示区域
     scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
     scrollArea->setMinimumHeight(320);
     scrollArea->setStyleSheet("QScrollArea { background-color: #f0f0f0; border: 1px solid #ccc; }");
 
-    // 图片以及解码文本展示
+    // 图片显示内容
     barcodeLabel = new QLabel();
-    barcodeLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);  // 文本左上对齐
-    barcodeLabel->setWordWrap(true);  // 允许文本换行
-    barcodeLabel->setStyleSheet("QLabel { background-color: #fafafa; font-family: Consolas; font-size: 12pt; padding: 5px; }");
-
-    // 设置QLabel的尺寸策略，使其可以扩展
+    barcodeLabel->setAlignment(Qt::AlignCenter);  // 图片居中
+    barcodeLabel->setStyleSheet("QLabel { background-color: #fafafa; padding: 16px; font-family: Consolas; font-size: 14pt;  }");
     barcodeLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    // 将QLabel设置为滚动区域的内容
+    // 将 QLabel 设置为滚动区域的内容
     scrollArea->setWidget(barcodeLabel);
 
     mainLayout->addWidget(scrollArea);
 
+    // 连接信号与槽
     connect(browseButton, &QPushButton::clicked, this, &BarcodeWidget::onBrowseFile);
     connect(generateButton, &QPushButton::clicked, this, &BarcodeWidget::onGenerateClicked);
     connect(decodeToChemFile, &QPushButton::clicked, this, &BarcodeWidget::onDecodeToChemFileClicked);
@@ -106,7 +104,8 @@ BarcodeWidget::BarcodeWidget(QWidget* parent)
     });
 }
 
-void BarcodeWidget::updateButtonStates(const QString& filePath)
+
+void BarcodeWidget::updateButtonStates(const QString& filePath) const
 {
     if (filePath.isEmpty()) {
         // 文件路径为空，禁用所有功能按钮
@@ -171,14 +170,14 @@ void BarcodeWidget::onGenerateClicked()
     file.close();
 
     try {
-        std::string text = SimpleBase64::encode(reinterpret_cast<const std::uint8_t*>(data.constData()), data.size());
+        const std::string text = SimpleBase64::encode(reinterpret_cast<const std::uint8_t*>(data.constData()), data.size());
 
         ZXing::MultiFormatWriter writer(ZXing::BarcodeFormat::QRCode);
         writer.setMargin(1);
 
-        auto bitMatrix = writer.encode(text, 300, 300);
-        int width = bitMatrix.width();
-        int height = bitMatrix.height();
+        const auto bitMatrix = writer.encode(text, 300, 300);
+        const int width = bitMatrix.width();
+        const int height = bitMatrix.height();
         cv::Mat img(height, width, CV_8UC1);
 
         for (int y = 0; y < height; ++y)
