@@ -76,7 +76,7 @@ jobs:
         with:
           version: "5.12.12"
           target: "desktop"
-          arch: "win64_msvc2019_64"
+          arch: "win64_msvc2017_64"
           install-deps: true
 
       - name: Install dependencies
