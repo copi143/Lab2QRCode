@@ -190,8 +190,17 @@ jobs:
             libboost-all-dev \
             cmake ninja-build build-essential \
             libopencv-dev libspdlog-dev \
-            libzxing-dev \
             libxlsxwriter-dev
+
+      # ---- Build ZXing (Linux) ----
+      - name: Build zxing-cpp
+        run: |
+          git clone https://github.com/zxing-cpp/zxing-cpp.git --depth 1
+          cmake -S zxing-cpp -B zxing-cpp/build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF
+          sudo cmake --build zxing-cpp/build --parallel
+          sudo cmake --install zxing-cpp/build --prefix /usr/local
 
       # ---- Configure and Build Project ----
       - name: Configure and build project
