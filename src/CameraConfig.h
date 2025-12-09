@@ -1,13 +1,13 @@
 #pragma once
 
-#include <vector>
 #include <QString>
 #include <format>
+#include <vector>
 
 struct CameraConfig {
-    int width;
-    int height;
-    int fps;
+    int     width;
+    int     height;
+    int     fps;
     QString pixelFormat;
 
     operator QString() const;
@@ -35,5 +35,5 @@ struct CameraConfig {
      * @param configs 支持的摄像头配置列表
      * @return 选择的最佳摄像头配置
      */
-    static CameraConfig selectBestCameraConfig(const std::vector<CameraConfig>& configs);
+    static CameraConfig selectBestCameraConfig(const std::vector<CameraConfig> &configs);
 };
