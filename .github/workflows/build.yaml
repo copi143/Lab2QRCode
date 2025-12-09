@@ -185,7 +185,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             qtbase5-dev qt5-qmake \
-            qtmultimedia5-dev \
+            qtmultimedia5-dev qml-module-qtmultimedia \
             libboost-all-dev \
             cmake ninja-build build-essential \
             libopencv-dev libspdlog-dev \
@@ -226,7 +226,8 @@ jobs:
             --executable ${{ env.release_file }} \
             --appdir appdir \
             --icon-file images/Lab2QRCode.png \
-            --create-desktop-file
+            --create-desktop-file \
+            --plugin qt
           
           mv *.AppImage ${{ env.release_name }}.AppImage
 
