@@ -5,8 +5,8 @@ on:
     branches:
       - master
     tags:
-      - 'v*'   # 例如 v1.0, v2.0, v2.0.1 等
-  pull_request:    
+      - "v*" # 例如 v1.0, v2.0, v2.0.1 等
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -48,7 +48,7 @@ jobs:
           platform_version: 2022
           toolset: msvc
           cache: true
-            
+
       - name: Install dependencies
         shell: pwsh
         run: |
@@ -73,12 +73,12 @@ jobs:
               INTERFACE_INCLUDE_DIRECTORIES "${OpenCV_INCLUDE_DIRS}"
           )
           set(OpenCV_LIBS OpenCV::OpenCV)
-          '@ | Out-File -FilePath $opencvConfig -Encoding UTF8 
+          '@ | Out-File -FilePath $opencvConfig -Encoding UTF8
 
           # 构建 zxing-cpp
           git clone --depth 1 https://github.com/zxing-cpp/zxing-cpp.git `
             ../zxing-cpp --recurse -b v2.3.0
-            
+
           cmake -S ../zxing-cpp -B ../zxing-cpp/build -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build ../zxing-cpp/build --config Release
           cmake --install ../zxing-cpp/build --prefix "${{ github.workspace }}/deps"
@@ -159,7 +159,7 @@ jobs:
       # 6️⃣ 上传构建产物到 GitHub Release 需要开启读写权限
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
-        if: github.ref_type == 'tag' 
+        if: github.ref_type == 'tag'
         with:
           files: "${{ env.release_zip  }}"
         env:
@@ -227,7 +227,7 @@ jobs:
             --appdir appdir \
             --icon-file images/Lab2QRCode.png \
             --create-desktop-file
-          
+
           mv *.AppImage ${{ env.release_name }}.AppImage
 
       # ---- Upload Build Artifacts ----

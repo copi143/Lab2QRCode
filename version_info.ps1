@@ -14,7 +14,7 @@ $git_commit_time = git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S' 2>$
 
 # 使用中国时区，获取构建的时间
 $build_time = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId(
-    [DateTime]::UtcNow, 
+    [DateTime]::UtcNow,
     'China Standard Time'
 ).ToString('yyyy-MM-dd HH:mm:ss')
 

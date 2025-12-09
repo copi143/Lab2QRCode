@@ -19,7 +19,6 @@
 
 ![单文件生成与解码](images/单文件生成和解码.gif)
 
-
 ### 手动输入生成条码
 
 ![手动输入生成条码](images/手动输入生成条码.gif)
@@ -30,16 +29,11 @@
 
 ![批量文件生成条码](images/批量生成和解码.gif)
 
-
 解码不在乎条码类型选择的是什么，默认尝试所有 19 种条码进行解码。
 
 ### 摄像头扫描识别
 
-
-
-https://github.com/user-attachments/assets/d6fbb77c-bed0-4dca-acd7-50650591413e
-
-
+<https://github.com/user-attachments/assets/d6fbb77c-bed0-4dca-acd7-50650591413e>
 
 ## 构建
 
@@ -79,28 +73,28 @@ cmake --build . -j --config Release
 
 Lab2QRCode 支持以下多种条码格式的生成和识别：
 
-| 条码类型 | 格式名称 | 类别 | 特点 |
-|---------|----------|------|------|
-| **QR Code** | QRCode | 二维码 | 高容量、快速读取 |
-| **Micro QR Code** | MicroQRCode | 二维码 | 小型QR码变体 |
-| **rMQR Code** | RMQRCode | 二维码 | 矩形微QR码 |
-| **Aztec Code** | Aztec | 二维码 | 不需要留白边 |
-| **Data Matrix** | DataMatrix | 二维码 | 小尺寸标识 |
-| **PDF417** | PDF417 | 二维码 | 堆叠式线性码 |
-| **MaxiCode** | MaxiCode | 二维码 | 货运包裹使用 |
-| **EAN-13** | EAN13 | 一维码 | 商品零售 |
-| **EAN-8** | EAN8 | 一维码 | 小型商品 |
-| **UPC-A** | UPCA | 一维码 | 北美商品 |
-| **UPC-E** | UPCE | 一维码 | UPC压缩格式 |
-| **Code 128** | Code128 | 一维码 | 高密度字符集 |
-| **Code 39** | Code39 | 一维码 | 字母数字支持 |
-| **Code 93** | Code93 | 一维码 | Code39增强版 |
-| **Codabar** | Codabar | 一维码 | 血库、图书馆 |
-| **ITF** | ITF | 一维码 | 交插二五码 |
-| **DataBar** | DataBar | 一维码 | 原RSS码 |
-| **DataBar Expanded** | DataBarExpanded | 一维码 | 扩展数据容量 |
-| **DataBar Limited** | DataBarLimited | 一维码 | 有限字符集 |
-| **DX Film Edge** | DXFilmEdge | 一维码 | 电影胶片边码 |
+| 条码类型             | 格式名称        | 类别   | 特点             |
+|----------------------|-----------------|--------|------------------|
+| **QR Code**          | QRCode          | 二维码 | 高容量、快速读取 |
+| **Micro QR Code**    | MicroQRCode     | 二维码 | 小型QR码变体     |
+| **rMQR Code**        | RMQRCode        | 二维码 | 矩形微QR码       |
+| **Aztec Code**       | Aztec           | 二维码 | 不需要留白边     |
+| **Data Matrix**      | DataMatrix      | 二维码 | 小尺寸标识       |
+| **PDF417**           | PDF417          | 二维码 | 堆叠式线性码     |
+| **MaxiCode**         | MaxiCode        | 二维码 | 货运包裹使用     |
+| **EAN-13**           | EAN13           | 一维码 | 商品零售         |
+| **EAN-8**            | EAN8            | 一维码 | 小型商品         |
+| **UPC-A**            | UPCA            | 一维码 | 北美商品         |
+| **UPC-E**            | UPCE            | 一维码 | UPC压缩格式      |
+| **Code 128**         | Code128         | 一维码 | 高密度字符集     |
+| **Code 39**          | Code39          | 一维码 | 字母数字支持     |
+| **Code 93**          | Code93          | 一维码 | Code39增强版     |
+| **Codabar**          | Codabar         | 一维码 | 血库、图书馆     |
+| **ITF**              | ITF             | 一维码 | 交插二五码       |
+| **DataBar**          | DataBar         | 一维码 | 原RSS码          |
+| **DataBar Expanded** | DataBarExpanded | 一维码 | 扩展数据容量     |
+| **DataBar Limited**  | DataBarLimited  | 一维码 | 有限字符集       |
+| **DX Film Edge**     | DXFilmEdge      | 一维码 | 电影胶片边码     |
 
 ## 数据完整性保障
 
