@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - use-format
     tags:
       - "v*" # 例如 v1.0, v2.0, v2.0.1 等
   pull_request:
@@ -245,3 +246,18 @@ jobs:
           files: ${{ env.release_name }}.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  format-check:
+    name: Format Check
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+
+      - name: Format check for `src`
+        run: bash check-format.sh ./src/
