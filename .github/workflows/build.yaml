@@ -53,7 +53,14 @@ jobs:
       - name: Install dependencies
         shell: pwsh
         run: |
-          vcpkg install opencv[core]:x64-windows zxing-cpp:x64-windows spdlog:x64-windows libxlsxwriter:x64-windows
+          # 构建 zxing-cpp
+          git clone --depth 1 https://github.com/zxing-cpp/zxing-cpp.git `
+            ../zxing-cpp --recurse -b v2.3.0
+          cmake -S ../zxing-cpp -B ../zxing-cpp/build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build ../zxing-cpp/build --config Release
+          cmake --install ../zxing-cpp/build --prefix "${{ github.workspace }}/deps"
+
+          vcpkg install opencv[core]:x64-windows spdlog:x64-windows libxlsxwriter:x64-windows
 
         # ---------- Configure ----------
       - name: Configure CMake And Build Project
