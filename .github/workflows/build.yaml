@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - try-fix-workflow
     tags:
       - 'v*'   # 例如 v1.0, v2.0, v2.0.1 等
   pull_request:    
