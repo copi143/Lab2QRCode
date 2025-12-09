@@ -256,8 +256,10 @@ jobs:
 
       - name: Install clang-format
         run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-format
+          sudo apt update
+          sudo apt install -y curl gnupg
+          curl https://apt.llvm.org/llvm.sh | grep -Ev '^\s*apt(-get)?\s+install' | sudo bash -s 22
+          sudo apt-get install -y clang-format-22
 
       - name: Format check for `src`
         run: bash check-format.sh ./src/

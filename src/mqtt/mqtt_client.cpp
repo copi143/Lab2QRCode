@@ -53,8 +53,13 @@ MqttSubscriber::MqttSubscriber(const std::string     &host,
                                uint16_t               port,
                                const std::string     &client_id,
                                const MessageCallback &callback)
-    : ioc_(std::make_unique<boost::asio::io_context>()), client_(*ioc_), host_(host), port_(port),
-      client_id_(client_id), work_(boost::asio::make_work_guard(*ioc_)), callback_(callback) {}
+    : ioc_(std::make_unique<boost::asio::io_context>()),
+      client_(*ioc_),
+      host_(host),
+      port_(port),
+      client_id_(client_id),
+      work_(boost::asio::make_work_guard(*ioc_)),
+      callback_(callback) {}
 
 void MqttSubscriber::subscribe(const std::string &topic) {
     topic_ = topic;

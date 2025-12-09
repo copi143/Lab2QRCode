@@ -30,7 +30,8 @@ QRect scaleKeepAspect(const QRect &outer, const int w, const int h) {
 
 } // namespace
 
-FrameWidget::FrameWidget(QWidget *parent) : QWidget(parent) {
+FrameWidget::FrameWidget(QWidget *parent)
+    : QWidget(parent) {
     setStyleSheet("QWidget{border:1px solid black; background-color:black;}");
 }
 

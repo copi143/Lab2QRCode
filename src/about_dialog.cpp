@@ -13,7 +13,8 @@
 #include <QVBoxLayout>
 #include <spdlog/spdlog.h>
 
-AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent) {
+AboutDialog::AboutDialog(QWidget *parent)
+    : QDialog(parent) {
     setWindowTitle("关于 Lab2QRCode");
     setFixedSize(480, 420);
 

@@ -8,7 +8,8 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-MessageDialog::MessageDialog(QWidget *parent) : QDialog(parent) {
+MessageDialog::MessageDialog(QWidget *parent)
+    : QDialog(parent) {
     setMinimumSize(400, 300);
 
     // ---------------- 窗口属性 ----------------
@@ -101,7 +102,8 @@ MessageDialog::MessageDialog(QWidget *parent) : QDialog(parent) {
     connect(m_closeBtn, &QPushButton::clicked, this, &QDialog::accept);
 }
 
-MessageDialog::MessageDialog(QWidget *parent, const QStringList &buttons) : QDialog(parent) {
+MessageDialog::MessageDialog(QWidget *parent, const QStringList &buttons)
+    : QDialog(parent) {
     QString global_font_name = "Microsoft YaHei";
 
     // ---------------- 窗口属性 ----------------

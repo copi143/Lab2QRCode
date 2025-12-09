@@ -111,11 +111,14 @@ struct result_i2t { //image to text result, 傻瓜式expected
     std::string text{};
     errcode     err{};
 
-    [[nodiscard]] explicit(false) result_i2t(const std::string &text) : text(text) {}
+    [[nodiscard]] explicit(false) result_i2t(const std::string &text)
+        : text(text) {}
 
-    [[nodiscard]] explicit(false) result_i2t(std::string &&text) : text(std::move(text)) {}
+    [[nodiscard]] explicit(false) result_i2t(std::string &&text)
+        : text(std::move(text)) {}
 
-    [[nodiscard]] explicit(false) result_i2t(errcode err) : err(err) {}
+    [[nodiscard]] explicit(false) result_i2t(errcode err)
+        : err(err) {}
 
     explicit operator bool() const noexcept {
         return !err;

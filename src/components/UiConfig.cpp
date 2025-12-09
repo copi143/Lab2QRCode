@@ -20,7 +20,8 @@ namespace {
 static QFont g_appFont;
 }
 
-Ui::Ui() : config(loadUiConfig("./setting/config.json")) {}
+Ui::Ui()
+    : config(loadUiConfig("./setting/config.json")) {}
 
 UiConfig Ui::loadUiConfig(const std::string &filename) {
     UiConfig config;

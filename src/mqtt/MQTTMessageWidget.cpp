@@ -4,7 +4,8 @@
 #include <QTextCodec>
 #include <QTextStream>
 
-MQTTMessageWidget::MQTTMessageWidget(QWidget *parent) : QWidget(parent) {
+MQTTMessageWidget::MQTTMessageWidget(QWidget *parent)
+    : QWidget(parent) {
     setupUI();
     setWindowTitle("MQTT消息监控");
     setMinimumSize(800, 600);

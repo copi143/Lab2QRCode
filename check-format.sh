@@ -5,7 +5,7 @@ dir="${1:-./src/}"
 fail=0
 for file in $(find "$dir" -type f \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \)); do
   echo "正在检查: $file"
-  diff=$(clang-format "$file" | diff -u "$file" -)
+  diff=$(clang-format-22 "$file" | diff -u "$file" -)
   if [ $? -ne 0 ]; then
     echo "========================= 发现不规范的格式 ========================="
     echo "$diff"

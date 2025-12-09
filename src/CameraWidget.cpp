@@ -130,7 +130,8 @@ cv::Mat RectifyPolygonToRect(const cv::Mat &img, const ZXing::Barcode &bc) {
 }
 
 // 构造函数里枚举摄像头
-CameraWidget::CameraWidget(QWidget *parent) : QWidget(parent) {
+CameraWidget::CameraWidget(QWidget *parent)
+    : QWidget(parent) {
     setWindowTitle("摄像头预览");
     setMinimumSize(800, 600);
 
@@ -572,8 +573,8 @@ void CameraWidget::exportResultsToXlsx(const QString &filePath) {
             const int         imgWidth   = std::stoi(getText(5));
             const int         imgHeight  = std::stoi(getText(6));
             lxw_image_options options    = {
-                   .x_scale = 150.0 / imgWidth,
-                   .y_scale = 150.0 / imgHeight,
+                .x_scale = 150.0 / imgWidth,
+                .y_scale = 150.0 / imgHeight,
             };
             worksheet_insert_image_buffer_opt(
                 worksheet, row, 1, (const unsigned char *)ba.constData(), ba.size(), &options);

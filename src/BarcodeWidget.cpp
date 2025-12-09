@@ -112,7 +112,8 @@ static QRegularExpression fileExtensionRegex_text(R"(^.*\.(?:txt|json|rfa)$)",
 static QRegularExpression fileExtensionRegex_image(R"(^.*\.(?:png|jpg|jpeg|bmp|gif|tiff|webp)$)",
                                                    QRegularExpression::CaseInsensitiveOption);
 
-BarcodeWidget::BarcodeWidget(QWidget *parent) : QWidget(parent) {
+BarcodeWidget::BarcodeWidget(QWidget *parent)
+    : QWidget(parent) {
     setWindowTitle("Lab2QRCode");
     setMinimumSize(500, 600);
 
