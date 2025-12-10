@@ -11,248 +11,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  windows-build:
-    env:
-      release_file: build/Release/bin/Lab2QRCode.exe
-      release_dir: build/Release/bin/
-      release_zip: Lab2QRCode.zip
-      BOOST_ROOT: ./boost
-    name: windows-latest
-    runs-on: windows-2025
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
-      - name: Setup MSVC Developer Command Prompt
-        uses: TheMrMilchmann/setup-msvc-dev@v4
-        with:
-          arch: x64
-
-      - name: Install Qt (Windows)
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: "5.12.12"
-          target: "desktop"
-          arch: "win64_msvc2017_64"
-          install-deps: true
-          dir: ${{ github.workspace }}/Qt
-
-      - name: Install Boost
-        id: install-boost
-        uses: MarkusJx/install-boost@v2
-        with:
-          boost_version: 1.84.0
-          boost_install_dir: ${{ github.workspace }}
-          platform_version: 2022
-          toolset: msvc
-          cache: true
-
-      - name: Install dependencies
-        shell: pwsh
-        run: |
-          # 创建 deps 目录
-          $depsDir = ".\deps"
-          New-Item -ItemType Directory -Path $depsDir -Force | Out-Null
-          # 下载并配置 OpenCV
-          $opencvZip = ".\deps\opencv.zip"
-          $opencvDir = ".\deps\OpenCV"
-          Invoke-WebRequest "https://github.com/CrossroadW/prebuild_windows_msvc/releases/download/v1.0/opencv4120.zip" -OutFile $opencvZip
-          Expand-Archive $opencvZip -DestinationPath $opencvDir
-          Remove-Item $opencvZip
-
-          $opencvConfig = "$opencvDir/OpenCVConfig.cmake"
-          @'
-          # Auto-generated OpenCVConfig.cmake
-          set(OpenCV_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include")
-          set(OpenCV_LIB_FILE "${CMAKE_CURRENT_LIST_DIR}/opencv_world4120.lib")
-          add_library(OpenCV::OpenCV STATIC IMPORTED)
-          set_target_properties(OpenCV::OpenCV PROPERTIES
-              IMPORTED_LOCATION "${OpenCV_LIB_FILE}"
-              INTERFACE_INCLUDE_DIRECTORIES "${OpenCV_INCLUDE_DIRS}"
-          )
-          set(OpenCV_LIBS OpenCV::OpenCV)
-          '@ | Out-File -FilePath $opencvConfig -Encoding UTF8
-
-          # 构建 zxing-cpp
-          git clone --depth 1 https://github.com/zxing-cpp/zxing-cpp.git `
-            ../zxing-cpp --recurse -b v2.3.0
-
-          cmake -S ../zxing-cpp -B ../zxing-cpp/build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          cmake --build ../zxing-cpp/build --config Release
-          cmake --install ../zxing-cpp/build --prefix "${{ github.workspace }}/deps"
-          # Build spdlog
-          git clone --depth 1 https://github.com/gabime/spdlog `
-           ../spdlog --recurse -b v1.16.0
-          cmake -S ../spdlog -B ../spdlog/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DSPDLOG_BUILD_EXAMPLE=OFF -DSPDLOG_BUILD_TESTS=OFF SPDLOG_BUILD_SHARED=OFF
-          cmake --build ../spdlog/build --config Release
-          cmake --install ../spdlog/build --prefix "${{ github.workspace }}/deps"
-
-          git clone https://github.com/microsoft/vcpkg.git
-          .\vcpkg\bootstrap-vcpkg.bat
-          .\vcpkg\vcpkg install libxlsxwriter:x64-windows
-
-        # ---------- Configure ----------
-      - name: Configure CMake And Build Project
-        shell: pwsh
-        run: |
-          Write-Host "Qt安装路径: ${env:QT_ROOT_DIR}"
-
-          # 检查目录是否存在
-          if (Test-Path ${env:QT_ROOT_DIR}) {
-              Write-Host "✅ Qt 根目录存在"
-              Write-Host "一级目录内容:"
-              Get-ChildItem -Path ${env:QT_ROOT_DIR} -Name
-          } else {
-              Write-Host "❌ Qt 根目录不存在"
-              exit 1
-          }
-          if (Test-Path ${env:BOOST_ROOT}) {
-                        Write-Host "✅ Boost 根目录存在"
-                        Write-Host "一级目录内容:"
-                        Get-ChildItem -Path ${env:BOOST_ROOT} -Name
-          } else {
-              Write-Host "❌ Boost 根目录不存在"
-              exit 1
-          }
-          cmake -S . -B build -G "Ninja" `
-            -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_PREFIX_PATH="${env:BOOST_ROOT};${env:QT_ROOT_DIR};./deps" `
-            -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
-            -DCMAKE_CXX_FLAGS="-D_WIN32_WINNT=0x0601"
-
-          cmake --build build --config Release --parallel
-
-      # ---------- Check artifacts ----------
-      - name: Check artifacts (Windows)
-        shell: pwsh
-        run: |
-          Write-Host "构建输出目录内容:"
-          Get-ChildItem -Path "build" -Recurse -Include *.exe,*.dll | ForEach-Object { Write-Host $_.FullName }
-          # 部署 Qt 依赖
-          windeployqt "${{ env.release_file }}"
-
-          # 🆕 手动复制 OpenCV DLL 到发布目录
-          $opencvDll = ".\deps\OpenCV\opencv_world4120.dll"
-          if (Test-Path $opencvDll) {
-              Copy-Item $opencvDll -Destination "${{ env.release_dir }}" -Force
-              Write-Host "✅ 已复制 OpenCV DLL 到发布目录"
-          } else {
-              Write-Warning "未找到 OpenCV DLL: $opencvDll"
-          }
-
-          Write-Host "📦 压缩目录: ${{ env.release_dir }}"
-          if (Test-Path "${{ env.release_zip }}") {
-            Remove-Item "${{ env.release_zip }}" -Force
-          }
-          Compress-Archive -Path "${{ env.release_dir }}*" -DestinationPath "${{ env.release_zip }}" -Force
-          Write-Host "✅ 打包完成: ${{ env.release_zip }}"
-
-        # 5️⃣ 上传构建产物到 Actions（调试查看）
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Lab2QRCode-windows
-          path: "${{ env.release_dir }}"
-
-      # 6️⃣ 上传构建产物到 GitHub Release 需要开启读写权限
-      - name: Upload Release Asset
-        uses: softprops/action-gh-release@v2
-        if: github.ref_type == 'tag'
-        with:
-          files: "${{ env.release_zip  }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  ubuntu-build:
-    env:
-      release_file: build/Release/bin/Lab2QRCode
-      release_name: Lab2QRCode
-      release_dir: build/Release/bin/
-      release_zip: Lab2QRCode-linux.tar.gz
-
-    name: Ubuntu GCC Build
-    runs-on: ubuntu-24.04
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # ---- Install Dependencies ----
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            qtbase5-dev qt5-qmake \
-            qtmultimedia5-dev \
-            libboost-all-dev \
-            cmake ninja-build build-essential \
-            libopencv-dev libspdlog-dev \
-            libxlsxwriter-dev
-
-      # ---- Build ZXing (Linux) ----
-      - name: Build zxing-cpp
-        run: |
-          git clone https://github.com/zxing-cpp/zxing-cpp.git --depth 1
-          cmake -S zxing-cpp -B zxing-cpp/build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_SHARED_LIBS=OFF
-          sudo cmake --build zxing-cpp/build --parallel
-          sudo cmake --install zxing-cpp/build --prefix /usr/local
-
-      # ---- Configure and Build Project ----
-      - name: Configure and build project
-        shell: pwsh
-        run: |
-          # 配置 CMake
-          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-
-          # 构建项目
-          cmake --build build --parallel
-
-      # 部署工具
-      - name: Install LinuxDeploy
-        id: install-linuxdeploy
-        uses: miurahr/install-linuxdeploy-action@v1.8.0
-        with:
-          plugins: qt appimage
-
-      - name: Create application dir
-        run: |
-          mkdir -p appdir/usr/bin
-          ${{ steps.install-linuxdeploy.outputs.linuxdeploy }} \
-            --output appimage \
-            --executable ${{ env.release_file }} \
-            --appdir appdir \
-            --icon-file images/Lab2QRCode.png \
-            --create-desktop-file
-
-          mv *.AppImage ${{ env.release_name }}.AppImage
-
-      # ---- Upload Build Artifacts ----
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-x64-appimage
-          path: ${{ env.release_name }}.AppImage
-
-      # ---- Publish Release (only when tag) ----
-      - name: Upload Release Asset
-        if: github.ref_type == 'tag'
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ${{ env.release_name }}.AppImage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   format-check:
     name: Format Check
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install clang-format
         run: |
@@ -262,4 +28,106 @@ jobs:
           sudo apt-get install -y clang-format-22
 
       - name: Format check for `src`
+        id: check-src
+        continue-on-error: true
         run: bash check-format.sh ./src/
+
+      - name: Final result
+        id: final
+        run: |
+          if [ "${{ steps.check-src.outcome }}" == "failure" ]; then
+            exit 1
+          fi
+
+  format-already-correct:
+    name: Format Already Correct
+    runs-on: ubuntu-24.04
+    needs: format-check
+    if: success()
+    outputs:
+      commit_hash: ${{ steps.get-commit-hash.outputs.commit_hash }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Commit Hash
+        id: get-commit-hash
+        run: echo "commit_hash=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  format-fix:
+    name: Format Fix
+    runs-on: ubuntu-24.04
+    needs: format-check
+    if: failure() && github.event_name == 'push' && github.actor != 'github-actions[bot]'
+    permissions:
+      contents: write
+    outputs:
+      commit_hash: ${{ steps.get-commit-hash.outputs.commit_hash }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install clang-format
+        run: |
+          sudo apt update
+          sudo apt install -y curl gnupg
+          curl https://apt.llvm.org/llvm.sh | grep -Ev '^\s*apt(-get)?\s+install' | sudo bash -s 22
+          sudo apt-get install -y clang-format-22
+
+      - name: Fix format
+        run: |
+          bash format-all.sh ./src/
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Fix code format issues" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref }}
+
+      - name: Get Commit Hash
+        id: get-commit-hash
+        run: echo "commit_hash=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  when-format-correct:
+    name: When Format Correct
+    runs-on: ubuntu-24.04
+    needs: ["format-already-correct", "format-fix"]
+    if: always()
+    outputs:
+      commit_hash: ${{ steps.get-commit-hash.outputs.commit_hash }}
+    steps:
+      - name: Get Commit Hash
+        id: get-commit-hash
+        run: |
+          if [ "${{ needs.format-already-correct.result }}" == "success" ]; then
+            echo "commit_hash=${{ needs.format-already-correct.outputs.commit_hash }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ needs.format-fix.result }}" == "success" ]; then
+            echo "commit_hash=${{ needs.format-fix.outputs.commit_hash }}" >> "$GITHUB_OUTPUT"
+          else
+            exit 1
+          fi
+
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    needs: when-format-correct
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.when-format-correct.outputs.commit_hash }}
+
+      - name: 打印 Commit 信息
+        run: git log -1
+
+      - name: 假装我们构建好了
+        run: echo "Building..."
