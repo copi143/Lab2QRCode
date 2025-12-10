@@ -173,9 +173,9 @@ CameraWidget::CameraWidget(QWidget *parent)
 
     // 全选
     connect(selectAllAction, &QAction::triggered, this, [this, formatActions] {
-            for (auto *act : formatActions) {
-                act->setChecked(true);
-            }
+        for (auto *act : formatActions) {
+            act->setChecked(true);
+        }
         isEnabledScan = true;
     });
 
@@ -344,12 +344,13 @@ void CameraWidget::startCamera(int camIndex) {
         auto cap = std::make_unique<cv::VideoCapture>(camIndex);
         if (!cap->isOpened()) {
             spdlog::error("Failed to open camera {}", camIndex);
-            QMetaObject::invokeMethod(      this,
-                [this] {   QMessageBox::warning(this, "错误", "无法打开摄像头");
-         cameraStarted = false;
-                     },
-             
-             
+            QMetaObject::invokeMethod(
+                this,
+                [this] {
+                    QMessageBox::warning(this, "错误", "无法打开摄像头");
+                    cameraStarted = false;
+                },
+
                 Qt::QueuedConnection);
             return;
         }
